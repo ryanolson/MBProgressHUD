@@ -149,14 +149,12 @@
 
 - (void)updateLabelText:(NSString *)newText {
     if (labelText != newText) {
-        [labelText release];
         labelText = [newText copy];
     }
 }
 
 - (void)updateDetailsLabelText:(NSString *)newText {
     if (detailsLabelText != newText) {
-        [detailsLabelText release];
         detailsLabelText = [newText copy];
     }
 }
@@ -171,13 +169,13 @@
     }
 	
     if (mode == MBProgressHUDModeDeterminate) {
-        self.indicator = [[[MBRoundProgressView alloc] init] autorelease];
+        self.indicator = [[MBRoundProgressView alloc] init];
     }
     else if (mode == MBProgressHUDModeCustomView && self.customView != nil){
         self.indicator = self.customView;
     } else {
-		self.indicator = [[[UIActivityIndicatorView alloc]
-						   initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge] autorelease];
+		self.indicator = [[UIActivityIndicatorView alloc]
+						   initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
         [(UIActivityIndicatorView *)indicator startAnimating];
 	}
 	
@@ -200,7 +198,7 @@
 	MBProgressHUD *hud = [[MBProgressHUD alloc] initWithView:view];
 	[view addSubview:hud];
 	[hud show:animated];
-	return [hud autorelease];
+	return hud;
 }
 
 + (BOOL)hideHUDForView:(UIView *)view animated:(BOOL)animated {
@@ -285,21 +283,6 @@
 		rotationTransform = CGAffineTransformIdentity;
     }
     return self;
-}
-
-- (void)dealloc {
-	[[NSNotificationCenter defaultCenter] removeObserver:self];
-	
-    [indicator release];
-    [label release];
-    [detailsLabel release];
-    [labelText release];
-    [detailsLabelText release];
-	[graceTimer release];
-	[minShowTimer release];
-	[showStarted release];
-	[customView release];
-    [super dealloc];
 }
 
 #pragma mark -
@@ -484,8 +467,8 @@
 - (void)showWhileExecuting:(SEL)method onTarget:(id)target withObject:(id)object animated:(BOOL)animated {
 	
     methodForExecution = method;
-    targetForExecution = [target retain];
-    objectForExecution = [object retain];
+    targetForExecution = target;
+    objectForExecution = object;
 	
     // Launch execution in new thread
 	taskInProgress = YES;
@@ -496,7 +479,7 @@
 }
 
 - (void)launchExecution {
-    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+    // NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	
     // Start executing the requested task
     [targetForExecution performSelector:methodForExecution withObject:objectForExecution];
@@ -505,7 +488,7 @@
     // be done only in the main thread)
     [self performSelectorOnMainThread:@selector(cleanUp) withObject:nil waitUntilDone:NO];
 	
-    [pool release];
+    // [pool release];
 }
 
 - (void)animationFinished:(NSString *)animationID finished:(BOOL)finished context:(void*)context {
@@ -533,11 +516,10 @@
 
 - (void)cleanUp {
 	taskInProgress = NO;
-	
 	self.indicator = nil;
 	
-    [targetForExecution release];
-    [objectForExecution release];
+    targetForExecution = nil;
+    objectForExecution = nil;
 	
     [self hide:useAnimation];
 }
