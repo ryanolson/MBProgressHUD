@@ -237,8 +237,7 @@
 	if ([view isKindOfClass:[UIWindow class]]) {
 		[self setTransformForCurrentOrientation:NO];
 	}
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceOrientationDidChange:) 
-												 name:UIDeviceOrientationDidChangeNotification object:nil];
+	// [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceOrientationDidChange:) name:UIDeviceOrientationDidChangeNotification object:nil];
 	
 	return me;
 }
